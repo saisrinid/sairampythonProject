@@ -8,8 +8,6 @@ def main():
     db_details=DB_DETAILS[env]
     #print(db_details)
     tables=get_tables('table_list.txt')
-    for table in tables:
-        print(table)
 
 
 
