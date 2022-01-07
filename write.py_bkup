@@ -1,0 +1,27 @@
+#from utils import get_postgres_conn
+
+
+def write_data(tgt_db,table_name,col_names,data,batchsize=100):
+    conn=get_postgres_conn( tgt_db['DB_USER'],
+                            tgt_db['DB_PASS'],
+                            tgt_db['DB_HOST'],
+                            tgt_db['DB_NAME']
+                    )
+    cursor=conn.cursor()
+    recs=[]
+    cnt=0
+    for rec in data:
+        rec_map=tuple(map(lambda x:x.replace(x,'%s'),rec))
+        record=','.join(rec_map)
+        recs.append(record)
+        cnt+=1
+        if cnt%batchsize==0:
+            query= f'insert into {table_name}({col_names}) values({recs})'
+            cursor.execute(query)
+            conn.commit()
+            recs = []
+        query = f'insert into {table_name}({col_names}) values({recs})'
+        cursor.execute(query)
+        conn.commit()
+
+    conn.close()
